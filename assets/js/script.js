@@ -1,20 +1,28 @@
 var userFormEl = document.querySelector("#user-form");
 
 var txtcity = document.querySelector("#txtcity");
-const APIKey = "3de2f08a8967b631ca3c2fe4e3450eac";
+
 var WelcomeDiv = document.querySelector("#WelcomeDiv");
+
+// Helper method to conver farenheight to celcius
 function fToC(fahrenheit) {
   var fTemp = fahrenheit;
   var fToCel = ((fTemp - 32) * 5) / 9;
   var message = fToCel.toFixed(2) + "\xB0C.";
   return message;
 }
+
+//helper method to get icon url
 function getWeatherCodeURL(code) {
   return `http://openweathermap.org/img/wn/${code}.png`;
 }
+
+//helper method to check null
 function isEmpty(value) {
   return value == undefined || value == null || value.length === 0;
 }
+
+//Form sumbit method
 var formSubmitHandler = function (event) {
   event.preventDefault();
   console.log("Submit");
@@ -24,7 +32,33 @@ var formSubmitHandler = function (event) {
     var url = `http://api.openweathermap.org/geo/1.0/direct?q=${keyword}&limit=5&appid=${APIKey}`;
     var obj = getCityFromAPI(url);
   }
+}
+
+//get city's lat and lon API
+var getCityFromAPI = function (url) {
+  var apiUrl = url;
+
+  fetch(apiUrl).then(function (response) {
+    if (response.ok) {
+      response.json().then(function (data) {
+        if (data.length > 0) {
+          var obj = data[0];
+          SaveData(obj.lat, obj.lon);
+          getWeatherFromAPI(obj.lat, obj.lon);
+          return;
+        } else {
+          alert("Please enter a valid city to search");
+          txtcity.value = "";
+          return;
+        }
+      });
+    } else {
+      document.location.replace("./index.html");
+    }
+  });
 };
+
+//Get weather detail for next 5 days based on lat and lon
 var getWeatherFromAPI = function (lat, lon) {
   var apiUrl = `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&exclude=hourly,minutely&appid=${APIKey}`;
   main_div.classList.remove("d-none");
@@ -49,6 +83,7 @@ var getWeatherFromAPI = function (lat, lon) {
   });
 };
 
+//Load the content into page with api response data
 var LoadWeatherDetails = function (data, current) {
   console.log(data);
 
@@ -102,28 +137,7 @@ var LoadWeatherDetails = function (data, current) {
   return;
 };
 
-var getCityFromAPI = function (url) {
-  var apiUrl = url;
-
-  fetch(apiUrl).then(function (response) {
-    if (response.ok) {
-      response.json().then(function (data) {
-        if (data.length > 0) {
-          var obj = data[0];
-          SaveData(obj.lat, obj.lon);
-          getWeatherFromAPI(obj.lat, obj.lon);
-          return;
-        } else {
-          alert("Please enter a valid city to search");
-          txtcity.value = "";
-          return;
-        }
-      });
-    } else {
-      document.location.replace("./index.html");
-    }
-  });
-};
+//Get previously entered data from internal data
 function GetDataFromStorage() {
   var data = localStorage.getItem("Weather_data");
 
@@ -133,6 +147,8 @@ function GetDataFromStorage() {
     return JSON.parse(data);
   }
 }
+
+//Save internal data
 function SaveData(lat, lon) {
   var data = localStorage.getItem("Weather_data");
   var main_div = document.querySelector("#main_div");
@@ -160,18 +176,23 @@ function SaveData(lat, lon) {
     }
     localStorage.setItem("Weather_data", JSON.stringify(pdata));
   }
-  Init();
+  LoadHistoryCity();
   return;
 }
+
+//Button click method for list of histry city
 function LoadDataByCityButtonClick(event) {
   var button = event.target;
-
+  console.log(button);
+txtcity.value=button.textContent;
   getWeatherFromAPI(
     button.getAttribute("data-lat"),
     button.getAttribute("data-lon")
   );
 }
-function Init() {
+
+//Load buttons for already searched cities
+function LoadHistoryCity() {
   var storage = GetDataFromStorage();
   if (storage != null) {
     var buttonDiv = document.querySelector("#buttonDiv");
@@ -187,6 +208,8 @@ function Init() {
     }
   }
 }
+
+
 userFormEl.addEventListener("submit", formSubmitHandler);
 
-Init();
+LoadHistoryCity();
