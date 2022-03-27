@@ -3,7 +3,7 @@ var userFormEl = document.querySelector("#user-form");
 var txtcity = document.querySelector("#txtcity");
 
 var WelcomeDiv = document.querySelector("#WelcomeDiv");
-
+const APIKey = "3de2f08a8967b631ca3c2fe4e3450eac";
 // Helper method to conver farenheight to celcius
 function fToC(fahrenheit) {
   var fTemp = fahrenheit;
