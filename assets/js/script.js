@@ -14,7 +14,7 @@ function fToC(fahrenheit) {
 
 //helper method to get icon url
 function getWeatherCodeURL(code) {
-  return `http://openweathermap.org/img/wn/${code}.png`;
+  return `https://openweathermap.org/img/wn/${code}.png`;
 }
 
 //helper method to check null
@@ -29,7 +29,7 @@ var formSubmitHandler = function (event) {
   var keyword = txtcity.value.trim();
 
   if (keyword) {
-    var url = `http://api.openweathermap.org/geo/1.0/direct?q=${keyword}&limit=5&appid=${APIKey}`;
+    var url = `https://api.openweathermap.org/geo/1.0/direct?q=${keyword}&limit=5&appid=${APIKey}`;
     var obj = getCityFromAPI(url);
   }
 }
